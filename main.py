@@ -45,7 +45,7 @@ def signUp():
 
 
 if __name__ == "__main__":
-    app0.run()
+    app.run()
         
  
     
