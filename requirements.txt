@@ -1,2 +1,4 @@
 --find-links wheelhouse
 Flask==0.12.1
+
+mysql-connector==2.1.4
