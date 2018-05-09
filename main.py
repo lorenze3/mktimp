@@ -2,18 +2,18 @@ from flask import Flask, render_template, request, json
 from werkzeug import generate_password_hash, check_password_hash
 import mysql.connector
 
-app0 = Flask(__name__)
+app = Flask(__name__)
     
-@app0.route("/")
+@app.route("/")
 def main():
     #return "Yes This App Is Working"
 	 return render_template('index.html')
 
-@app0.route('/showSignUp')
+@app.route('/showSignUp')
 def showSignUp():
     return render_template('signup.html')
 
-@app0.route('/signUp',methods=['POST','GET'])
+@app.route('/signUp',methods=['POST','GET'])
 def signUp():
     try:
         _name = request.form['inputName']
