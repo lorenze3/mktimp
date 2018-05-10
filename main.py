@@ -24,7 +24,7 @@ def signUp():
         if _name and _email and _password:
             # All Good, let's call MySQL
             conn = mysql.connector.connect(user='roo', password='Pi3141592',
-                              host='127.0.0.1',port=50981
+                              host='127.0.0.1',port=50981,
                               database='localdb',autocommit=True)
             cursor = conn.cursor()
             _hashed_password = generate_password_hash(_password)
@@ -56,7 +56,7 @@ def validateLogin():
         _username = request.form['inputEmail']
         _password = request.form['inputPassword']
         conn = mysql.connector.connect(user='roo', password='Pi3141592',
-                              host='127.0.0.1',port=50981
+                              host='127.0.0.1',port=50981,
                               database='localdb',)
         cursor = conn.cursor()
         cursor.callproc('sp_validateLogin',(_username,))
