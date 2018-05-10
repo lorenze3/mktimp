@@ -23,8 +23,8 @@ def signUp():
         # validate the received values
         if _name and _email and _password:
             # All Good, let's call MySQL
-            conn = mysql.connector.connect(user='roo', password='Pi3141592',
-                              host='127.0.0.1',port=50981,
+            conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
+                              host='127.0.0.1',port=50839,
                               database='Bucketlist',autocommit=True)
             cursor = conn.cursor()
             _hashed_password = generate_password_hash(_password)
@@ -55,9 +55,9 @@ def validateLogin():
     try:
         _username = request.form['inputEmail']
         _password = request.form['inputPassword']
-        conn = mysql.connector.connect(user='roo', password='Pi3141592',
-                              host='127.0.0.1',port=50981,
-                              database='Bucketlist',)
+        conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
+                              host='127.0.0.1',port=50839,
+                              database='Bucketlist')
         cursor = conn.cursor()
         cursor.callproc('sp_validateLogin',(_username,))
         for reg in cursor.stored_results():
