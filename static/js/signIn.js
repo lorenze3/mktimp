@@ -1,8 +1,8 @@
 $(function(){
-	$('#btnSignUp').click(function(){
+	$('#btnSignIn1').click(function(){
 		
 		$.ajax({
-			url: '/signUp',
+			url: '/validateLogin',
 			data: $('form').serialize(),
 			type: 'POST',
 			success: function(response){

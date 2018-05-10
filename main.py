@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, json, redirect, session
 from werkzeug import generate_password_hash, check_password_hash
 import mysql.connector
+import uuid
+import os
 
 app = Flask(__name__)
 app.secret_key = 'I am the very model of a modern major general'
-    
+app.config['UPLOAD_FOLDER'] = 'static/Uploads' 
+
 @app.route("/")
 def main():
     #return "Yes This App Is Working"
@@ -67,7 +70,7 @@ def validateLogin():
                 session['user'] = data[0][0]
                 return redirect('/userHome')
             else:
-                return render_template('error.html','Wrong Email address or Password.')
+                return render_template('error.html',error='Wrong Email address or Password.')
         else:
             return render_template('error.html',error = 'Email address not found.')
     except Exception as e:
@@ -88,6 +91,14 @@ def logout():
     session.pop('user',None)
     return redirect('/')
 
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        file = request.files['file']
+        extension = os.path.splitext(file.filename)[1]
+        f_name = str(uuid.uuid4()) + extension
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+        return json.dumps({'filename':f_name})
 
 if __name__ == "__main__":
     app.run(debug=True)
