@@ -1,0 +1,12 @@
+#sql stuff for db setup
+
+CREATE DATABASE bucketlist;
+
+CREATE TABLE BucketList.tbl_user (
+  user_id BIGINT AUTO_INCREMENT,
+  user_name VARCHAR(45) NULL,
+  user_password VARCHAR(500) NULL,
+  user_username VARCHAR(45) NULL,
+  PRIMARY KEY (user_id));
+  
+  
