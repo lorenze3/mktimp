@@ -97,7 +97,7 @@ def userHome():
                                   host='127.0.0.1',
                                   database='BucketList',autocommit=True)
             cursor = conn.cursor()
-    
+            return render_template('userHome.html', message ='connected')
             cursor.callproc('sp_addinputD`',(session.get['username'],f_name))
             for reg in cursor.stored_results():
                 data=reg.fetchall()
