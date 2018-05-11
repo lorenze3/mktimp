@@ -10,7 +10,7 @@
     <link href="../static/signup.css" rel="stylesheet">
       <script src="../static/js/jquery-1.11.2.js"></script>
 
-	<script src="../static/js/jquery.ui.widget.js"></script>
+	<!--<script src="../static/js/jquery.ui.widget.js"></script>
 	
 	<script type="text/javascript" src="../static/js/jquery.fileupload.js"></script>
 	<script type="text/javascript" src="../static/js/jquery.fileupload-process.js"></script>
@@ -35,7 +35,7 @@
 			        }
     			});
 		})
-	</script>
+	</script>-->
 	
   </head>
 
@@ -73,14 +73,14 @@
 
       <div class="jumbotron">
         <h1>Upload Model Data</h1>
-		
-		<div class="form-group" action="/upload" method="POST">
+		<form action="" method=post enctype=multipart/form-data>
+		<div class="form-group" action="upload" method="POST">
            
 		<div class="input-group">
                 <span class="input-group-btn">
                     <span class="btn btn-primary btn-file">
                         <input type="file" id="fileupload" name="file" multiple>
-				
+				<input type=submit value=Upload>
 						<input type="hidden" name="filePath" id="filePath"></input>
 				
                     </span>
@@ -88,7 +88,9 @@
 	
             </div>
 		</div>
+		</form>
 	
+	  
       </div>
 	  
 	

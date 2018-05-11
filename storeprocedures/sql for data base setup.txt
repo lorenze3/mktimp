@@ -9,4 +9,39 @@ CREATE TABLE BucketList.tbl_user (
   user_username VARCHAR(45) NULL,
   PRIMARY KEY (user_id));
   
+  CREATE TABLE BucketList.tbl_datafiles (
+  data_id BIGINT AUTO_INCREMENT,
+  user_name VARCHAR(45) NULL,
+  data_filename VARCHAR(500) NULL,
+  data_filename VARCHAR(500) NULL,
+  data_filename VARCHAR(500) NULL
+  PRIMARY KEY (data_id));
   
+ 
+ 
+ DELIMITER $$
+  CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_addinputD`(
+    IN p_filename VARCHAR(500),
+    IN p_username VARCHAR(45)
+)
+BEGIN
+    IF ( select exists (select 1 from tbl_datafiles where user_username = p_username && data_filename= p_filename ) ) THEN
+
+        select 'Existing Filename; Please rename.';
+
+    ELSE
+
+        insert into tbl_datafiles
+        (
+            user_username,
+            data_filename
+        )
+        values
+        (
+            p_username,
+            p_filename
+        );
+
+    END IF;
+END $$
+DELIMITER;

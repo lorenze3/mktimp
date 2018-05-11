@@ -68,6 +68,7 @@ def validateLogin():
         if len(data) > 0:
             if check_password_hash(str(data[0][2]),_password):
                 session['user'] = data[0][0]
+                session['username']=data[0][3]
                 return redirect('/userHome')
             else:
                 return render_template('error.html',error='Wrong Email address or Password.')
@@ -79,13 +80,42 @@ def validateLogin():
         cursor.close
         conn.close
 
-@app.route('/userHome')
+@app.route('/userHome', methods=['GET', 'POST'])
 def userHome():
-    if session.get('user'):
-        return render_template('userHome.html')
-    else:
-        return render_template('error.html',error ='Please Sign In')
-
+    if request.method == 'GET':
+        if session.get('user'):
+            return render_template('userHome.html')
+        else:
+            return render_template('error.html',error ='Please Sign In')
+    if request.method == 'POST':
+        file = request.files['file']
+        #extension = os.path.splitext(file.filename)[1]
+        f_name = file.filename#str(uuid.uuid4()) + extension
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+        try:
+            conn = mysql.connector.connect(user='root', password='Pi3141592',
+                                  host='127.0.0.1',
+                                  database='BucketList',autocommit=True)
+            cursor = conn.cursor()
+    
+            cursor.callproc('sp_addinputD`',(session.get['username'],f_name))
+            for reg in cursor.stored_results():
+                data=reg.fetchall()
+                if not('data' in locals()):
+                    conn.commit()
+                    #return redirect('/showSignin')
+                    return render_tempate('userHome.html',message= 'File Uploaded')#({'message':'User created successfully !'})
+                else:
+                     return render_template('error.html',error = 'Username already has a file of that name.')
+                     #return json.dumps({'error':str(msg[0])})
+            else:
+                return json.dumps({'html':'<span>Enter the required fields</span>'})
+        except Exception as e:
+            return json.dumps({'error':str(e)})
+        finally:
+            cursor.close() 
+            conn.close()
+    
 @app.route('/logout')
 def logout():
     session.pop('user',None)
