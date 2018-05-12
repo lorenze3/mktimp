@@ -49,7 +49,7 @@ def signUp():
             for reg in cursor.stored_results():
                msg=reg.fetchall()
             if not('msg' in locals()):
-                conn.commit()
+                #conn.commit()
                 m.recipients=[_email]
                 m.send_email()
                 return render_template('signup.html', message="Your account has been created!",message2="An input template and instructions have been emailed to you.",message3="Please sign in to continue.")
