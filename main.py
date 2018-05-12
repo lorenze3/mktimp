@@ -5,15 +5,19 @@ import uuid
 import os
 import time
 import Mailer
-
+import pandas as pd
+import numpy as np
+from rq import Queue
+from rq.job import Job
+from worker import redisconn
 #create mailer object and go ahead and put in passwords for now . . .
 
 m=Mailer.Mailer()
-m.subject='First Try'
+m.subject='How to use the No Touch Marketing Measurement webapp'
 m.send_from='notouchmarketingmeasurementapp@gmail.com'
 m.attachments=["C:\\Users\\TeamLorenzen\\Documents\\App0\\static\\downloads\\Input Template -- File name will be analysis title.csv"]
 m.gmail_password='%like%me'
-m.message="Howdy,\nI'm excited to share a very small proof of concept that I've used to learn a bit about cloud computing, web applications, and python.  \n\nIf you have any questions, please reply to this email.\n\nRegards, TL"
+m.message="Thanks for signing up!\nI'm excited to share a very small proof of concept that I've used to learn a bit about cloud computing, web applications, and python.  \n\nIf you have any questions, please reply to this email.\n\nRegards, TL"
 
 #end mailer setup.  
 
@@ -107,7 +111,7 @@ def userHome():
     if request.method == 'POST':
         struid=session.get('user')
         file = request.files['file']
-        f_name = file.filename
+        f_name = str(struid)+"_"+file.filename
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
         try:
             conn = mysql.connector.connect(user='root', password='Pi3141592',
@@ -119,8 +123,8 @@ def userHome():
                 data=rr.fetchall()
             if not('data' in locals()):
                 #success!
-                #conn.commit()
-                return render_template('userHome.html',message= 'File Uploaded . . .Ingesting Data. . .')#({'message':'User created successfully !'})
+                triggerModel=1
+                return render_template('userHome.html',message= 'File Uploaded . . .Ingesting Data. . .')
             else:
                 return render_template('userHome.html',message = 'Username already has a file of that name.')
         except Exception as e:
@@ -128,7 +132,13 @@ def userHome():
         finally:
             cursor.close() 
             conn.close()
-    
+            if triggerModel==1:
+                #df0=pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+                doModel(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+@app.route('/doModel')                
+def doModel(filein):
+    df0=pd.read_csv(filein)           
+    return render_template('userHome.html',message='Your data was yummy.  Results to Follow.')
 @app.route('/logout')
 def logout():
     session.pop('user',None)
