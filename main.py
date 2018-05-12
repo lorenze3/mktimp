@@ -3,7 +3,21 @@ from werkzeug import generate_password_hash, check_password_hash
 import mysql.connector
 import uuid
 import os
+import time
+import Mailer
 
+#create mailer object and go ahead and put in passwords for now . . .
+
+m=Mailer.Mailer()
+m.subject='First Try'
+m.send_from='notouchmarketingmeasurementapp@gmail.com'
+m.attachments=["C:\\Users\\TeamLorenzen\\Documents\\App0\\static\\downloads\\Input Template -- File name will be analysis title.csv"]
+m.gmail_password='%like%me'
+m.message="Howdy,\nI'm excited to share a very small proof of concept that I've used to learn a bit about cloud computing, web applications, and python.  \n\nIf you have any questions, please reply to this email.\n\nRegards, TL"
+
+#end mailer setup.  
+
+#define flask server
 app = Flask(__name__)
 app.secret_key = 'I am the very model of a modern major general'
 app.config['UPLOAD_FOLDER'] = 'static/Uploads' 
@@ -36,7 +50,10 @@ def signUp():
                msg=reg.fetchall()
             if not('msg' in locals()):
                 conn.commit()
-                return redirect('/showSignin')
+                m.recipients=[_email]
+                m.send_email()
+                return render_template('signup.html', message="Your account has been created!",message2="An input template and instructions have been emailed to you.",message3="Please sign in to continue.")
+                #return redirect('/showSignin')
                 #return json.dumps({'message':'User created successfully !'})
             else:
                  return render_template('error.html',error = 'Username already exists; Sign in or create new account.')
