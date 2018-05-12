@@ -68,7 +68,7 @@ def validateLogin():
         if len(data) > 0:
             if check_password_hash(str(data[0][2]),_password):
                 session['user'] = data[0][0]
-                session['username']=data[0][3]
+                session['username']= data[0][1]
                 return redirect('/userHome')
             else:
                 return render_template('error.html',error='Wrong Email address or Password.')
@@ -88,28 +88,24 @@ def userHome():
         else:
             return render_template('error.html',error ='Please Sign In')
     if request.method == 'POST':
+        struid=session.get('user')
         file = request.files['file']
-        #extension = os.path.splitext(file.filename)[1]
-        f_name = file.filename#str(uuid.uuid4()) + extension
+        f_name = file.filename
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
         try:
             conn = mysql.connector.connect(user='root', password='Pi3141592',
                                   host='127.0.0.1',
                                   database='BucketList',autocommit=True)
             cursor = conn.cursor()
-            return render_template('userHome.html', message ='connected')
-            cursor.callproc('sp_addinputD`',(session.get['username'],f_name))
-            for reg in cursor.stored_results():
-                data=reg.fetchall()
-                if not('data' in locals()):
-                    conn.commit()
-                    #return redirect('/showSignin')
-                    return render_tempate('userHome.html',message= 'File Uploaded')#({'message':'User created successfully !'})
-                else:
-                     return render_template('error.html',error = 'Username already has a file of that name.')
-                     #return json.dumps({'error':str(msg[0])})
+            cursor.callproc('sp_addinputD',(f_name,struid))
+            for rr in cursor.stored_results():
+                data=rr.fetchall()
+            if not('data' in locals()):
+                #success!
+                #conn.commit()
+                return render_template('userHome.html',message= 'File Uploaded . . .Ingesting Data. . .')#({'message':'User created successfully !'})
             else:
-                return json.dumps({'html':'<span>Enter the required fields</span>'})
+                return render_template('userHome.html',message = 'Username already has a file of that name.')
         except Exception as e:
             return json.dumps({'error':str(e)})
         finally:
