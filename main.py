@@ -105,9 +105,21 @@ def validateLogin():
 def userHome():
     if request.method == 'GET':
         if session.get('user'):
-            return render_template('userHome.html')
+            try:
+                conn = mysql.connector.connect(user='root', password='Pi3141592',
+                                      host='127.0.0.1',
+                                      database='BucketList')
+                cursor = conn.cursor()
+                querystring="Select data_filename from tbl_datafiles where user_id="+str(session.get('user'))+"&& data_decompname IS NOT NULL;"
+                cursor.execute(querystring)
+                results=cursor.fetchall()
+                #results is list of tuples;
+                return render_template('userHome.html', results=results)
+            except Exception as e:
+                return json.dumps({'error':str(e)})
         else:
             return render_template('error.html',error ='Please Sign In')
+        
     if request.method == 'POST':
         struid=session.get('user')
         file = request.files['file']
@@ -132,13 +144,14 @@ def userHome():
         finally:
             cursor.close() 
             conn.close()
-            if triggerModel==1:
+            #if triggerModel==1:
                 #df0=pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
-                doModel(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+
 @app.route('/doModel')                
 def doModel(filein):
     df0=pd.read_csv(filein)           
     return render_template('userHome.html',message='Your data was yummy.  Results to Follow.')
+
 @app.route('/logout')
 def logout():
     session.pop('user',None)

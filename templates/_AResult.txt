@@ -1,0 +1,9 @@
+<table>
+        <tr valign="top">
+            <td>
+                <!--<a href="{{ url_for('result', result=uid_resid) }}">-->
+                    {{ result }}
+                </a>
+            </td>
+        </tr>
+    </table>

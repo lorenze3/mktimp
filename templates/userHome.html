@@ -91,6 +91,11 @@
 		</form>
 
 	     <h1><p style="color:red;">{{message}}</p></h1>
+		 
+			{% for result in results %}
+        {% include '_Aresult.html' %}
+			{% endfor %}
+
 	  
       </div>
 	  
