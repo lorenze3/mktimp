@@ -136,7 +136,9 @@ def userHome():
             if not('data' in locals()):
                 #success!
                 triggerModel=1
+                #need to learn how to get upload message on page while using the redirect to trigger the results
                 return render_template('userHome.html',message= 'File Uploaded . . .Ingesting Data. . .')
+                #return redirect('/userHome')
             else:
                 return render_template('userHome.html',message = 'Username already has a file of that name.')
         except Exception as e:
