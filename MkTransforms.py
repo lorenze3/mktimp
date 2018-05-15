@@ -88,4 +88,7 @@ def MkTransforms(rawdf):
             dictAdstockDFs[k][vv]=dictAdstockDFs[k][vv]-dictAdstockDFs[k][vv].mean()
     #need to recombine them
     datadf=pd.concat(dictAdstockDFs[k] for k in dictAdstockDFs.keys())
+    #Add dummies for ID variables that are not time (assuming time id is last one!)
+    datadf=pd.get_dummies(datadf,columns=IDnames[0:len(IDnames)-1])
+
     return IDnames, groups, transforms,knownSigns, datadf
