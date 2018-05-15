@@ -1,7 +1,7 @@
 place,product,week,y,price,TV
 gid,pid,tid,dependent,price,marketing
-,,,log,log,retain:0.5
-,,,,-,+
+none,none,none,log,log,adstock
+none,none,none,none,-,+
 North,mousetrap,1,10.24019291,10,0
 North,mousetrap,2,10.24019291,10,0
 North,mousetrap,3,10.24019291,10,0
