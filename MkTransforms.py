@@ -1,11 +1,8 @@
-import pandas as pd
-#import numpy as np
-
 def MkTransforms(rawdf):
     #pass in dataframe with control rows on top following expected format
     #output is the
-    #names of id columns, groups for decomps, transforms, knownsigns for models
-    #and dataframe with only data that is transformed 
+    #names of id columns, groups for decomps, transforms, knownsigns for models, original dep variable
+    #and dataframe with only data that is transformed for modeling 
     #get the data
     import pandas as pd
     import numpy as np
@@ -41,7 +38,10 @@ def MkTransforms(rawdf):
     
     #get the data only frame, convert to floats when possible
     datadf=rawdf.iloc[3:rawdf.shape[0],:]
-      
+    #get original dependent in a dataframe to be returned for use in decomps
+    idxdep=[i for i,word in enumerate(groups) if word==('dependent')]
+    depV=rawdf.columns.values[idxdep].tolist()
+    origDep=datadf[depV]
     #Adstock transform -- everyone gets a .5 for now!
     retention=0.5
     #forAdstock=rawdf.iloc[3:rawdf.shape[0],needForAdstock]
@@ -56,18 +56,18 @@ def MkTransforms(rawdf):
     
     #apply adstocking to each sub-DF for each variable to be adstocked
     for k in dictAdstockDFs.keys():
-        idxmin=min(dictAdstockDFs[k].index.values)
-        for idx,row in dictAdstockDFs[k].iterrows():
-            for adstvar in AdstockVs:
-                adstockedcausal=adstvar+'_stock'
-                value=float(row[adstvar])
-                #print(count,value)
-                if idx==idxmin: #first row is first wweek, needs special care
-                    dictAdstockDFs[k].at[idx,adstvar]=value
-                    oldvalue=value
+        idxmin=dictAdstockDFs[k].index.values.min()
+        for adstvar in AdstockVs:
+            for i,row in dictAdstockDFs[k][adstvar].iteritems():
+                if i==idxmin: #first row is first wweek, needs special care
+                    #dictAdstockDFs[k].at[i,adstvar]=value
+                    oldvalue=0.0
+                    #print(k,i,oldvalue)
                 else:
-                    dictAdstockDFs[k].at[idx,adstvar]=value+retention*oldvalue
-                    oldvalue=value+retention*oldvalue
+                    #print("start",i,dictAdstockDFs[k].loc[i,adstvar])
+                    dictAdstockDFs[k].at[i,adstvar]=pd.to_numeric(dictAdstockDFs[k].loc[i,adstvar])+retention*oldvalue
+                    oldvalue=dictAdstockDFs[k].loc[i,adstvar]
+                    #print("end",i,dictAdstockDFs[k].loc[i,adstvar])
     #need to recombine them
     datadf=pd.concat(dictAdstockDFs[k] for k in dictAdstockDFs.keys())
     
@@ -88,7 +88,8 @@ def MkTransforms(rawdf):
             dictAdstockDFs[k][vv]=dictAdstockDFs[k][vv]-dictAdstockDFs[k][vv].mean()
     #need to recombine them
     datadf=pd.concat(dictAdstockDFs[k] for k in dictAdstockDFs.keys())
-    #Add dummies for ID variables that are not time (assuming time id is last one!)
+    
+    #make dummies for all IDs other than time
     datadf=pd.get_dummies(datadf,columns=IDnames[0:len(IDnames)-1])
-
-    return IDnames, groups, transforms,knownSigns, datadf
+    
+    return depV,IDnames, groups, transforms,knownSigns, origDep,datadf
