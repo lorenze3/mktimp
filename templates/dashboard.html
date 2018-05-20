@@ -9,33 +9,23 @@
     <link href="http://getbootstrap.com/docs/4.1/examples/jumbotron/jumbotron.css" rel="stylesheet">
     <link href="../static/signup.css" rel="stylesheet">
       <script src="../static/js/jquery-1.11.2.js"></script>
+  <!-- D3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://d14fo0winaifog.cloudfront.net/plotly-basic.js"></script>
 
-	<!--<script src="../static/js/jquery.ui.widget.js"></script>
-	
-	<script type="text/javascript" src="../static/js/jquery.fileupload.js"></script>
-	<script type="text/javascript" src="../static/js/jquery.fileupload-process.js"></script>
-	<script type="text/javascript" src="../static/js/jquery.fileupload-ui.js"></script>
-    
-   <script>
-		$(function(){
-			    $('#fileupload').fileupload({
-        			url: 'upload',
-        			dataType: 'json',
-        			add: function (e, data) {
-        				data.submit();
-        			},
-			        success:function(response,status) {
-					console.log(response.filename);
-					var filePath = 'static/Uploads/' + response.filename;
-					$('#filePath').val(filePath);
-			        	console.log('success');
-			        },
-			        error:function(error){
-			        	console.log(error);
-			        }
-    			});
-		})
-	</script>-->
+    <script type="text/javascript">
+
+        var graphs = {{graphJSON | safe}};
+        var ids = {{ids | safe}};
+
+        for(var i in graphs) {
+            Plotly.plot(ids[i], // the ID of the div, created above
+                        graphs[i].data,
+                        graphs[i].layout || {});
+        }
+
+   
 	
   </head>
 
@@ -60,7 +50,7 @@
           <li class="nav-item">
             <a class="nav-link" href="showSignin">Sign In</a>
           </li>
-		  <li class="nav-item active">
+		  <li class="nav-item">
             <a class="nav-link" href="userHome">Results List</a>
           </li>
 		  <li class="nav-item">
@@ -75,29 +65,10 @@
 
 
       <div class="jumbotron">
-        <h1>Upload Model Data</h1>
-		<form action="" method=post enctype=multipart/form-data>
-		<div class="form-group" action="upload" method="POST">
-           
-		<div class="input-group">
-                <span class="input-group-btn">
-                    <span class="btn btn-primary btn-file">
-                        <input type="file" id="fileupload" name="file" multiple>
-				<input type=submit value=Upload>
-						<input type="hidden" name="filePath" id="filePath"></input>
-				
-                    </span>
-                </span>
-	
-            </div>
-		</div>
-		</form>
-
-	     <h1><p style="color:red;">{{message}}</p></h1>
-		 
-			{% for result in results %}
-        {% include '_Aresult.html' %}
-			{% endfor %}
+         {% for id in ids %}
+        <h3>{{id}}</h3>
+        <div id="{{id}}"></div>
+    {% endfor %}
 
 	  
       </div>

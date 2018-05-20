@@ -1,5 +1,5 @@
 place,product,week,y,price,TV1,TV2,ProgVideo1
-gid,pid,tid,dependent,price,marketing,marketing,marketing
+gid,pid,tid,dependent,Price,TV,TV,Digital
 none,none,none,logmc,logmc,adstock,adstock,adstock
 none,none,none,none,-,+,+,+
 North,mousetrap,1,10.24019291,10,0,0,0
