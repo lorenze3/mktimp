@@ -94,7 +94,7 @@ DELIMITER;
 BEGIN
 	update tbl_datafiles
 		set data_resultsname=p_jsonname,
-		    data_ts = NOW()
+				data_ts = NOW()
 		where user_id=p_user_id;
 END $$
 DELIMITER;

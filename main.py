@@ -91,8 +91,8 @@ def validateLogin():
             if check_password_hash(str(data[0][2]),_password):
                 session['user'] = data[0][0]
                 session['username']= data[0][1]
-                querystring2="update tbl_user set user_lastlogin = NOW() where user_id="+str(data[0][0])+";"
-                cursor.execute(querystring2)
+                #querystring2="update tbl_user set user_lastlogin = NOW() where user_id="+str(data[0][0])+";"
+                #cursor.execute(querystring2)
                 return redirect('/userHome')
             else:
                 return render_template('error.html',error='Wrong Email address or Password.')
@@ -194,8 +194,21 @@ def skipthisstuff():
 
 @app.route('/logout')
 def logout():
-    session.pop('user',None)
-    return redirect('/')
+    try:
+        struid=session.get('user')
+        conn = mysql.connector.connect(user='root', password='Pi3141592',
+                                          host='127.0.0.1',
+                                          database='BucketList')
+        cursor = conn.cursor()
+        cursor.execute(querystring2)
+        querystring2='update tbl_user set user_lastlogin = NOW() where user_id='+struid+';'
+        session.pop('user',None)
+        return redirect('/')
+    except:
+        pass
+    finally:
+        cursor.close()
+        conn.close()
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
