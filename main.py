@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, json, redirect, session
+from flask import Flask, render_template, request, json, redirect, session, url_for
 from werkzeug import generate_password_hash, check_password_hash
 import mysql.connector
 import uuid
@@ -7,9 +7,10 @@ import time
 import Mailer
 import pandas as pd
 import numpy as np
-from rq import Queue
-from rq.job import Job
-from worker import redisconn
+import MKTransforms
+import plotly2json
+#%tbimport math
+
 #create mailer object and go ahead and put in passwords for now . . .
 
 m=Mailer.Mailer()
@@ -17,7 +18,7 @@ m.subject='How to use the No Touch Marketing Measurement webapp'
 m.send_from='notouchmarketingmeasurementapp@gmail.com'
 m.attachments=["C:\\Users\\TeamLorenzen\\Documents\\App0\\static\\downloads\\Input Template -- File name will be analysis title.csv"]
 m.gmail_password='%like%me'
-m.message="Thanks for signing up!\nI'm excited to share a very small proof of concept that I've used to learn a bit about cloud computing, web applications, and python.  \n\nIf you have any questions, please reply to this email.\n\nRegards, TL"
+m.message="Thanks for signing up!\nI'm excited to share a small prototype of marketing analytics 'as a service' I built to integrate my understandiing of cloud computing, web applications, and a variety of open source tools. \n\nIf you have any questions, please reply to this email.\n\nRegards, TL"
 
 #end mailer setup.  
 
@@ -90,6 +91,8 @@ def validateLogin():
             if check_password_hash(str(data[0][2]),_password):
                 session['user'] = data[0][0]
                 session['username']= data[0][1]
+                querystring2="update tbl_user set user_lastlogin = NOW() where user_id="+str(data[0][0])+";"
+                cursor.execute(querystring2)
                 return redirect('/userHome')
             else:
                 return render_template('error.html',error='Wrong Email address or Password.')
@@ -110,7 +113,7 @@ def userHome():
                                       host='127.0.0.1',
                                       database='BucketList')
                 cursor = conn.cursor()
-                querystring="Select data_filename from tbl_datafiles where user_id="+str(session.get('user'))+"&& data_decompname IS NOT NULL;"
+                querystring="Select data_filename from tbl_datafiles where user_id="+str(session.get('user'))+"&& data_resultsname IS NOT NULL;"
                 cursor.execute(querystring)
                 results=cursor.fetchall()
                 #results is list of tuples;
@@ -136,23 +139,58 @@ def userHome():
             if not('data' in locals()):
                 #success!
                 triggerModel=1
+                rawdf=pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+                #reate model data with user provied transforms
+                depMeans,depV,IDnames, groups, transforms, knownSigns, origDep,datadf=MKTransforms.MKTransforms(rawdf)
+                #run models and select best (altough first pass just runs one model, no sign constraint)
+                intcoef, X1, Y1 =MKTransforms.runModels(depV,IDnames,groups, knownSigns, origDep,datadf)
+                #create decomps
+                origSpaceDecomp,modSpaceDecomp, =MKTransforms.decomp0(X1,Y1,origDep,intcoef,depV,depMeans,transforms,rawdf,IDnames)
+                #group decomps
+                groupedDecomp=MKTransforms.makeGroupedDecomp(origSpaceDecomp,groups,depV)
+                #compute elasticites
+                elasts=MKTransforms.calcElast(intcoef,X1,IDnames,groups, transforms)
+                #make plotly dashboard
+                figAll=MKTransforms.createDash(groupedDecomp,IDnames,rawdf,groups,elasts)
+                #dump to json
+                jsonname=os.path.join(app.config['UPLOAD_FOLDER'], f_name+'results.json')
+                plotly2json.plotlyfig2json(figAll, jsonname)
+                #tag it in database
+                cursor.callproc('sp_addresults',(jsonname,struid))
                 #need to learn how to get upload message on page while using the redirect to trigger the results
-                return render_template('userHome.html',message= 'File Uploaded . . .Ingesting Data. . .')
-                #return redirect('/userHome')
+                #return render_template('userHome.html',message= 'File Uploaded . . .Ingesting Data. . .')
+                return redirect(url_for('userHome',message='File Ingested Sucessfully'))
             else:
                 return render_template('userHome.html',message = 'Username already has a file of that name.')
         except Exception as e:
             return json.dumps({'error':str(e)})
         finally:
+            #close mysql connectino
             cursor.close() 
-            conn.close()
-            #if triggerModel==1:
-                #df0=pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+            conn.close()                
 
-@app.route('/doModel')                
-def doModel(filein):
-    df0=pd.read_csv(filein)           
-    return render_template('userHome.html',message='Your data was yummy.  Results to Follow.')
+def skipthisstuff():
+     if triggerModel==1:
+                #import data
+                rawdf=pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
+                #reate model data with user provied transforms
+                depMeans,depV,IDnames, groups, transforms, knownSigns, origDep,datadf=MkTransforms(rawdf)
+                #run models and select best (altough first pass just runs one model, no sign constraint)
+                intcoef, X1, Y1 =runModels(depV,IDnames,groups, knownSigns, origDep,datadf)
+                #create decomps
+                origSpaceDecomp,modSpaceDecomp, =decomp0(X1,Y1,origDep,intcoef,depV,depMeans)
+                #group decomps
+                groupedDecomp=makeGroupedDecomp(origSpaceDecomp,groups)
+                #compute elasticites
+                elasts=calcElast(intcoef,X1,IDnames,groups, transforms)
+                #compute current vs past changed by time id decomps
+                YoY,aggGroupedDecomp=createDash(groupedDecomp,IDnames,rawdf)
+                #make plotly dashboard
+                figAll=createDash(groupedDecomp,IDnames,rawdf)
+                #dump to json
+                plotlyfig2json(figAll, os.path.join(app.config['UPLOAD_FOLDER'], f_name+'results.json'))
+                #put name into database (with date)
+                #cursor.callproc('sp_addresults',(f_name,struid,f_name+'results.json'))
 
 @app.route('/logout')
 def logout():
@@ -169,7 +207,7 @@ def upload():
         return render_template('error.html',error='it worked')#json.dumps({'filename':f_name})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
         
  
     

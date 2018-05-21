@@ -7,18 +7,59 @@ CREATE TABLE BucketList.tbl_user (
   user_name VARCHAR(45) NULL,
   user_password VARCHAR(500) NULL,
   user_username VARCHAR(45) NULL,
+  user_lastlogin TIMESTAMP NULL,
   PRIMARY KEY (user_id));
   
   CREATE TABLE BucketList.tbl_datafiles ( 
   data_id BIGINT AUTO_INCREMENT, 
   user_id BIGINT NULL, 
   data_filename VARCHAR(500) NULL, 
-  data_decompname VARCHAR(700) NULL, 
-  data_coeffname VARCHAR(700) NULL, 
-  data_changename VARCHAR(700) NULL,
+  data_resultsname VARCHAR(700) NULL,
+  data_ts TIMESTAMP NULL,
   PRIMARY KEY (data_id)) ;
   
- 
+ #stored procedure, for ease of reuse
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_createUser`(
+    IN p_name VARCHAR(45),
+    IN p_username VARCHAR(45),
+    IN p_password VARCHAR(500)
+)
+BEGIN
+    IF ( select exists (select 1 from tbl_user where user_username = p_username) ) THEN
+     
+        select 'Username Exists !!';
+     
+    ELSE
+     
+        insert into tbl_user
+        (
+            user_name,
+            user_username,
+            user_password
+        )
+        values
+        (
+            p_name,
+            p_username,
+            p_password
+        );
+     
+    END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_validateLogin`(
+IN p_username VARCHAR(45)
+)
+BEGIN
+    select * from tbl_user where user_username = p_username;
+END$$
+DELIMITER ;
+
+
  
  DELIMITER $$
  CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_addinputD`(
@@ -44,7 +85,26 @@ BEGIN
 END $$
 DELIMITER;
 
+
+ DELIMITER $$
+ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_addresults`(
+    IN p_jsonname VARCHAR(700),
+    IN p_user_id VARCHAR(45)
+)
+BEGIN
+	update tbl_datafiles
+		set data_resultsname=p_jsonname,
+		    data_ts = NOW()
+		where user_id=p_user_id;
+END $$
+DELIMITER;
+
 SELECT COLUMN_NAME 
 FROM INFORMATION_SCHEMA.COLUMNS 
 WHERE TABLE_SCHEMA='BucketList' 
     AND TABLE_NAME='tbl_datafiles';
+
+#to remove all recoreds
+truncate table tbl_datafiles
+
+DROP PROCEDURE IF EXISTS sp_addresults;
