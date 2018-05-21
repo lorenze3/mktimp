@@ -117,7 +117,17 @@ def userHome():
                 cursor.execute(querystring)
                 results=cursor.fetchall()
                 #results is list of tuples;
-                return render_template('userHome.html', results=results)
+                #trim off part before _ and extension
+                resNames=[]
+                resFiles=[]
+                for r in results:
+                    startchar=int(r[0].find('_')+1)
+                    endchar=int(r[0].find('.'))
+                    resNames.append(r[0][startchar:endchar])
+                    resFiles.append(r[0][0:len(r[0])-4]+'results.json')
+                    #resFiles.append(r[1])
+                betterResults=zip(resFiles,resNames)
+                return render_template('userHome.html', results=betterResults)
             except Exception as e:
                 return json.dumps({'error':str(e)})
         else:
@@ -153,7 +163,8 @@ def userHome():
                 #make plotly dashboard
                 figAll=MKTransforms.createDash(groupedDecomp,IDnames,rawdf,groups,elasts)
                 #dump to json
-                jsonname=os.path.join(app.config['UPLOAD_FOLDER'], f_name+'results.json')
+                f_nameNoExt=os.path.splitext(f_name)[0]
+                jsonname=os.path.join(app.config['UPLOAD_FOLDER'], f_nameNoExt+'results.json')
                 plotly2json.plotlyfig2json(figAll, jsonname)
                 #tag it in database
                 cursor.callproc('sp_addresults',(jsonname,struid))
@@ -188,27 +199,40 @@ def skipthisstuff():
                 #make plotly dashboard
                 figAll=createDash(groupedDecomp,IDnames,rawdf)
                 #dump to json
-                plotlyfig2json(figAll, os.path.join(app.config['UPLOAD_FOLDER'], f_name+'results.json'))
+                
+                plotlyfig2json(figAll, os.path.join(app.config['UPLOAD_FOLDER'], f_nameNoExt+'results.json'))
                 #put name into database (with date)
                 #cursor.callproc('sp_addresults',(f_name,struid,f_name+'results.json'))
 
 @app.route('/logout')
 def logout():
-    try:
         struid=session.get('user')
-        conn = mysql.connector.connect(user='root', password='Pi3141592',
-                                          host='127.0.0.1',
-                                          database='BucketList')
-        cursor = conn.cursor()
-        cursor.execute(querystring2)
-        querystring2='update tbl_user set user_lastlogin = NOW() where user_id='+struid+';'
-        session.pop('user',None)
-        return redirect('/')
-    except:
-        pass
-    finally:
-        cursor.close()
-        conn.close()
+        try:
+            conn = mysql.connector.connect(user='root', password='Pi3141592',
+                                              host='127.0.0.1',
+                                              database='BucketList',autocommit=True)
+            cursor = conn.cursor()
+            querystring2='update tbl_user set user_lastlogin = NOW() where user_id='+str(struid)+';'
+            cursor.execute(querystring2)
+            cursor.close()
+            conn.close()
+            session.pop('user',None)
+            return redirect('/')
+        except Exception as e:
+            return json.dumps({'error':str(e)})
+            
+    
+@app.route('/makeDash/<resultsfile>', methods=['GET','POST'])
+def makeDash(resultsfile):
+    try:
+        #have to chop off first / in path for some reason
+        thisJson=os.path.join(app.config['UPLOAD_FOLDER'], resultsfile)
+        #thisJson='static/Uploads/'+resultsfile
+        premade=plotly2json.plotlyfromjson(thisJson)
+        return render_template('dashboard.html',premade=premade)
+    except Exception as e:
+        return json.dumps({'error':str(e)})
+
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():

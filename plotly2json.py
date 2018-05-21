@@ -1,7 +1,7 @@
 import numpy as np
 import json
 from plotly.utils import PlotlyJSONEncoder
-from plotly.offline import download_plotlyjs, init_notebook_mode, iplot
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot
 import plotly.graph_objs as go
 init_notebook_mode()
 
@@ -30,8 +30,10 @@ def plotlyfig2json(fig, fpath=None):
 
 def plotlyfromjson(fpath):
     """Render a plotly figure from a json file"""
+    
     with open(fpath, 'r') as f:
         v = json.loads(f.read())
-
+    
     fig = go.Figure(data=v['data'], layout=v['layout'])
-    plot(fig, show_link=False)
+    #d=plot(fig, show_link=False,output_type='div')
+    return fig

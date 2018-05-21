@@ -92,13 +92,20 @@
             </div>
 		</div>
 		</form>
-
-	     <h1><p style="color:red;">{{message}}</p></h1>
+		
+		 <h3><p style="color:red;">{{message}}</p></h1>
+	<!--</div>
+	<div class="jumbotron">-->
+	    
+	<h1>View Dashboards</h1>
+		<form action="" method=post enctype=multipart/form-data>
+		<div class="form-group" action="showDash" method="POST">
 		 
 			{% for result in results %}
         {% include '_Aresult.html' %}
 			{% endfor %}
-
+		</div>
+		</form>
 	  
       </div>
 	  
