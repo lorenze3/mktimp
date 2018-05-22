@@ -291,11 +291,12 @@ def calcElast(intcoef,X1,IDnames,groups, transforms):
     elasticities=pd.Series(es,index=indxs,name='Elasticities') 
     return elasticities
 
-def createDash(groupedDecomp,IDnames,rawdf,groups,elasts):
+def createDash(groupedDecomp,IDnames,rawdf,groups,elasts,fname):
     import plotly.plotly as py
     from plotly.offline import init_notebook_mode, iplot, plot
     import plotly.graph_objs as go
     import math
+    import os
     #for decomps over time id, remove dependent from df
     subGroupedDecomp=groupedDecomp.drop('dependent',axis=1)
     #now use group by to get summed over all ids except time
@@ -376,14 +377,17 @@ def createDash(groupedDecomp,IDnames,rawdf,groups,elasts):
     figE=go.Figure(data=etraces,layout=layout3)
 
     from plotly import tools
-    figAll=tools.make_subplots(rows=2, cols=2, specs=[[{'colspan':2},None], [{},{}]], subplot_titles=('Target Variable Decomposition','Drivers of Change', 'Elasticities'))
+    figAll=tools.make_subplots(rows=2, cols=2, specs=[[{'colspan':2},None], [{},{}]], subplot_titles=('Target Variable Decomposition','Drivers of Change (%)', 'Elasticities'))
 
     for i,tr in enumerate(figTidDecomp['data']):
         figAll.append_trace(figTidDecomp['data'][i],1,1)
     #figAll.append_trace(figTidDecomp['data'][0],1,1)
     figAll.append_trace(figYoY['data'][0],2,1)
     figAll.append_trace(figE['data'][0],2,2)
-    figAll['layout'].update(showlegend=True, title='Model Results',barmode='relative')
+    #make title based on fname
+    titleFileName, file_extension = os.path.splitext(fname)
+    titleFileName=titleFileName[titleFileName.find('_')+1:]
+    figAll['layout'].update(showlegend=True, title=titleFileName+' Model Results',barmode='relative')
     #plot(figAll)
     return figAll
     

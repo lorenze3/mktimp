@@ -30,10 +30,11 @@ def plotlyfig2json(fig, fpath=None):
 
 def plotlyfromjson(fpath):
     """Render a plotly figure from a json file"""
-    
+    import os
     with open(fpath, 'r') as f:
         v = json.loads(f.read())
-    
     fig = go.Figure(data=v['data'], layout=v['layout'])
-    #d=plot(fig, show_link=False,output_type='div')
-    return fig
+    fpath2=os.path.splitext(fpath)[0]
+    htmlname=fpath2+'.html'
+    plot(fig, show_link=False,filename=htmlname, auto_open=False)
+    return htmlname

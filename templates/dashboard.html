@@ -49,18 +49,12 @@
     </nav>
          <h3 class="text-muted"></h3>
       </div>
-
-
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-      <div class="jumbotron">
-	  <div id="1"></div>
-	  <script>
-	  PID = document.getElementById('1');
-	  Plotly.plot( PID,{{premade}})
-	  
-	  
-	  </script>
-      </div>
+ <div class="jumbotron">
+<iframe src="{{premade}}" width= 100% class="myIframe"></iframe> 
+<script type="text/javascript" language="javascript"> 
+$('.myIframe').css('height', $(window).height()+'px');
+</script>
+</div>
 	  
 	
       

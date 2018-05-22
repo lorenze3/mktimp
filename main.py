@@ -161,7 +161,7 @@ def userHome():
                 #compute elasticites
                 elasts=MKTransforms.calcElast(intcoef,X1,IDnames,groups, transforms)
                 #make plotly dashboard
-                figAll=MKTransforms.createDash(groupedDecomp,IDnames,rawdf,groups,elasts)
+                figAll=MKTransforms.createDash(groupedDecomp,IDnames,rawdf,groups,elasts,f_name)
                 #dump to json
                 f_nameNoExt=os.path.splitext(f_name)[0]
                 jsonname=os.path.join(app.config['UPLOAD_FOLDER'], f_nameNoExt+'results.json')
@@ -179,30 +179,6 @@ def userHome():
             #close mysql connectino
             cursor.close() 
             conn.close()                
-
-def skipthisstuff():
-     if triggerModel==1:
-                #import data
-                rawdf=pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
-                #reate model data with user provied transforms
-                depMeans,depV,IDnames, groups, transforms, knownSigns, origDep,datadf=MkTransforms(rawdf)
-                #run models and select best (altough first pass just runs one model, no sign constraint)
-                intcoef, X1, Y1 =runModels(depV,IDnames,groups, knownSigns, origDep,datadf)
-                #create decomps
-                origSpaceDecomp,modSpaceDecomp, =decomp0(X1,Y1,origDep,intcoef,depV,depMeans)
-                #group decomps
-                groupedDecomp=makeGroupedDecomp(origSpaceDecomp,groups)
-                #compute elasticites
-                elasts=calcElast(intcoef,X1,IDnames,groups, transforms)
-                #compute current vs past changed by time id decomps
-                YoY,aggGroupedDecomp=createDash(groupedDecomp,IDnames,rawdf)
-                #make plotly dashboard
-                figAll=createDash(groupedDecomp,IDnames,rawdf)
-                #dump to json
-                
-                plotlyfig2json(figAll, os.path.join(app.config['UPLOAD_FOLDER'], f_nameNoExt+'results.json'))
-                #put name into database (with date)
-                #cursor.callproc('sp_addresults',(f_name,struid,f_name+'results.json'))
 
 @app.route('/logout')
 def logout():
@@ -228,8 +204,9 @@ def makeDash(resultsfile):
         #have to chop off first / in path for some reason
         thisJson=os.path.join(app.config['UPLOAD_FOLDER'], resultsfile)
         #thisJson='static/Uploads/'+resultsfile
+        #raise ValueError('before html')
         premade=plotly2json.plotlyfromjson(thisJson)
-        return render_template('dashboard.html',premade=premade)
+        return render_template('dashboard.html',premade='/'+premade)
     except Exception as e:
         return json.dumps({'error':str(e)})
 
