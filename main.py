@@ -18,8 +18,9 @@ m.subject='How to use the No Touch Marketing Measurement webapp'
 m.send_from='notouchmarketingmeasurementapp@gmail.com'
 m.attachments=["C:\\Users\\TeamLorenzen\\Documents\\App0\\static\\downloads\\Input Template -- File name will be analysis title.csv"]
 m.gmail_password='%like%me'
-m.message="Thanks for signing up!\nI'm excited to share a small prototype of marketing analytics 'as a service' I built to integrate my understandiing of cloud computing, web applications, and a variety of open source tools. \n\nIf you have any questions, please reply to this email.\n\nRegards, TL"
-
+with open('templates/Email text.txt', 'r') as myfile:
+  msg = myfile.read()
+m.message=msg
 #end mailer setup.  
 
 #define flask server

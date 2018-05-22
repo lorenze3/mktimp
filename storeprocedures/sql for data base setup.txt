@@ -108,3 +108,5 @@ WHERE TABLE_SCHEMA='BucketList'
 truncate table tbl_datafiles
 
 DROP PROCEDURE IF EXISTS sp_addresults;
+
+delete from tbl_user where user_username='lorenze3@gmail.com';
