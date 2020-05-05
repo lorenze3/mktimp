@@ -1,0 +1,7 @@
+flask
+plotly
+mysql-connector-python
+numpy
+scipy
+pandas
+sklearn
