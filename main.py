@@ -53,7 +53,7 @@ def signUp():
             if _name and _email and _password:
                 # All Good, let's call MySQL
                 conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
-                                  host='127.0.0.1',port=52770,
+                                  host='127.0.0.1',port=52912,
                                   database='BucketList',autocommit=True)
                 cursor = conn.cursor()
                 _hashed_password = generate_password_hash(_password)
