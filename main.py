@@ -22,7 +22,7 @@ m=Mailer.Mailer()
 m.subject='How to use the No Touch Marketing Measurement WebApp'
 m.send_from='notouchmarketingmeasurementapp@gmail.com'
 m.attachments =["static/downloads/Example.csv"]
-m.gmail_password='3141592Pi'
+m.gmail_password='zrskwvetbbxscfji'
 with open('templates/Email text.txt', 'r') as myfile:
   msg1 = myfile.read()
 m.message=msg1
