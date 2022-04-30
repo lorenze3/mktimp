@@ -62,7 +62,7 @@ def signUp():
             # validate the received values
             if _name and _email and _password:
                 # All Good, let's call MySQL
-                conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
+                conn = mysql.connector.connect(user=uid, password=pwd,
                                   host='127.0.0.1',port=mysqlport,
                                   database='BucketList',autocommit=True)
                 cursor = conn.cursor()
@@ -110,7 +110,7 @@ def validateLogin():
     try:
         _username = request.form['inputEmail']
         _password = request.form['inputPassword']
-        conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
+        conn = mysql.connector.connect(user=uid, password=pwd,
                               host='127.0.0.1',port=mysqlport,
                                   database='BucketList')
         cursor = conn.cursor()
@@ -139,7 +139,7 @@ def userHome():
     if request.method == 'GET':
         if session.get('user'):
             try:
-                conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
+                conn = mysql.connector.connect(user=uid, password=pwd,
                               host='127.0.0.1',port=mysqlport,
                                       database='BucketList')
                 cursor = conn.cursor()
@@ -169,7 +169,7 @@ def userHome():
         f_name = str(struid)+"_"+file.filename
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], f_name))
         try:
-            conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
+            conn = mysql.connector.connect(user=uid, password=pwd,
                               host='127.0.0.1',port=mysqlport,
                                   database='BucketList',autocommit=True)
             cursor = conn.cursor()
@@ -221,7 +221,7 @@ def userHome():
 def logout():
         struid=session.get('user')
         try:
-            conn = mysql.connector.connect(user='azure', password='6#vWHD_$',
+            conn = mysql.connector.connect(user=uid, password=pwd,
                                               host='127.0.0.1',port=mysqlport,
                                               database='BucketList',autocommit=True)
             cursor = conn.cursor()
