@@ -29,7 +29,7 @@ m.message=msg1
 #end mailer setup.  
 
 #define flask server
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='',static_folder='static')
 app.secret_key = 'I am the very model of a modern major general'
 app.config['UPLOAD_FOLDER'] = 'static/Uploads' 
 #port for mysql in D:\home\data\mysql\MYSQLCONNSTR_localdb.txt
