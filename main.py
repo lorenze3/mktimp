@@ -33,7 +33,7 @@ app = Flask(__name__,static_url_path='',static_folder='static')
 app.secret_key = 'I am the very model of a modern major general'
 app.config['UPLOAD_FOLDER'] = 'static/Uploads' 
 #port for mysql in D:\home\data\mysql\MYSQLCONNSTR_localdb.txt
-text_file = open("D:/home/data/mysql/MYSQLCONNSTR_localdb.txt", "r")
+text_file = open("C:/home/data/mysql/MYSQLCONNSTR_localdb.txt", "r")
 #read whole file to a string
 longstring = text_file.read()
 #close file
