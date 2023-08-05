@@ -1,5 +1,5 @@
 import sys,os
-sys.path.insert(0, "D:/home/site/wwwroot/env/Lib/site-packages")
+sys.path.insert(0, "C:/home/site/wwwroot/env/Lib/site-packages")
 sys.path.append(os.path.join(os.getcwd(), "site-packages"))
 from flask import Flask, render_template, request, json, redirect, session, url_for
 import flask
