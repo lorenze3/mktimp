@@ -2,6 +2,6 @@ Flask==1.1.2
 plotly==5.17.0
 mysql-connector-python==8.0.33
 numpy==1.19.5
-scipy==1.7.3
+scipy==1.5.3
 pandas==1.4.2
 scikit-learn==1.0.2
