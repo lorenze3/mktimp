@@ -7,12 +7,11 @@
    
    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
     <link href="http://getbootstrap.com/docs/4.1/examples/jumbotron/jumbotron.css" rel="stylesheet">
-    <link href="../static/signup.css" rel="stylesheet">
-      <script src="../static/js/jquery-1.11.2.js"></script>
+    <link href="{{url_for('static',filename='/signup.css')}} rel="stylesheet">
+      <script src="{{url_for('static',filename='/js/jquery-1.11.2.js')}}"></script>
   <!-- D3.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     <!-- Plotly.js -->
-  
 	
   </head>
 
@@ -50,7 +49,7 @@
          <h3 class="text-muted"></h3>
       </div>
  <div class="jumbotron">
-<iframe src="{{premade}}" width= 100% class="myIframe"></iframe> 
+<iframe src="{{premade}}" width= 100% class="myIframe" frameBorder="0" scrolling="no"></iframe> 
 <script type="text/javascript" language="javascript"> 
 $('.myIframe').css('height', $(window).height()+'px');
 </script>

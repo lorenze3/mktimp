@@ -1,5 +1,5 @@
 flask
-plotly
+plotly==5.17.0
 mysql-connector-python
 numpy
 scipy

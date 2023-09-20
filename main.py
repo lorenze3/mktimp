@@ -12,6 +12,7 @@ import Mailer
 import MKTransforms
 import numpy
 import pandas as pd
+import plotly
 import plotly2json
 import multiprocessing
 import modeldrone
@@ -31,7 +32,7 @@ m.message=msg1
 #define flask server
 app = Flask(__name__,static_url_path='',static_folder='static')
 app.secret_key = 'I am the very model of a modern major general'
-app.config['UPLOAD_FOLDER'] = 'static/Uploads' 
+app.config['UPLOAD_FOLDER'] = 'static/uploads' 
 #port for mysql in C:/home/data/mysql/MYSQLCONNSTR_localdb.txt" on azure, need a test version
 if os.path.isfile("c:\\users\loren\\Documents\\test_mysql_strings.txt"):
     f_to_use = "c:\\users\loren\\Documents\\test_mysql_strings.txt"
@@ -243,10 +244,13 @@ def logout():
 @app.route('/makeDash/<resultsfile>', methods=['GET','POST'])
 def makeDash(resultsfile):
     try:
-        thisJson=os.path.join(app.config['UPLOAD_FOLDER'], resultsfile)
+        thisJson=os.path.normpath(os.path.join(app.config['UPLOAD_FOLDER'], resultsfile))
+        
         #raise ValueError('before html')
         premade=plotly2json.plotlyfromjson(thisJson)
-        return render_template('dashboard.html',premade='/'+premade)
+        premade=premade[7:].replace("\\","/")
+        #print(premade)
+        return render_template('dashboard.html',premade=url_for('static', filename=premade))
     except Exception as e:
         return json.dumps({'error':str(e)})
 
@@ -263,11 +267,3 @@ def upload():
 #if __name__ == "__main__":
 #    app.run()
     
-    
-    
-    
-    
-    
-    
-    
-   
