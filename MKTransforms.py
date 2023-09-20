@@ -446,7 +446,7 @@ def calcElast(intcoef,X1,IDnames,groups, transforms):
     return elasticities
 
 def createDash(groupedDecomp,IDnames,rawdf,groups,elasts,fname):
-    import plotly.plotly as py
+    import chart_studio.plotly as py
     from plotly.offline import init_notebook_mode, iplot, plot
     import plotly.graph_objs as go
     import math
