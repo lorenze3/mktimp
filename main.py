@@ -22,7 +22,7 @@ m=Mailer.Mailer()
 m.subject='How to use the No Touch Marketing Measurement WebApp'
 m.send_from='notouchmarketingmeasurementapp@gmail.com'
 m.attachments =["static/downloads/Example.csv"]
-m.gmail_password='zrskwvetbbxscfji'
+m.gmail_password='emne nged upsb vpng'
 with open('templates/Email text.txt', 'r') as myfile:
   msg1 = myfile.read()
 m.message=msg1
@@ -32,14 +32,19 @@ m.message=msg1
 app = Flask(__name__,static_url_path='',static_folder='static')
 app.secret_key = 'I am the very model of a modern major general'
 app.config['UPLOAD_FOLDER'] = 'static/Uploads' 
-#port for mysql in D:\home\data\mysql\MYSQLCONNSTR_localdb.txt
-text_file = open("C:/home/data/mysql/MYSQLCONNSTR_localdb.txt", "r")
+#port for mysql in C:/home/data/mysql/MYSQLCONNSTR_localdb.txt" on azure, need a test version
+if os.path.isfile("c:\\users\loren\\Documents\\test_mysql_strings.txt"):
+    f_to_use = "c:\\users\loren\\Documents\\test_mysql_strings.txt"
+else:
+    f_to_use = "C:/home/data/mysql/MYSQLCONNSTR_localdb.txt"
+
+text_file = open(f_to_use, "r")
 #read whole file to a string
 longstring = text_file.read()
 #close file
 text_file.close()
 #port is after the first colon and is 5 characters long
-mysqlport=int(longstring[longstring.find(':')+1:longstring.find(':')+6])
+mysqlport=int(longstring[longstring.find(':')+1:longstring.find(';',longstring.find(':'))])
 uid=longstring[longstring.find("Id=")+3:longstring.find(";",longstring.find("Id=")+1)] 
 pwd=longstring[longstring.find("Password=")+9:] 
 
